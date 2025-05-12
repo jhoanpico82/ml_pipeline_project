@@ -1,5 +1,6 @@
 # src/train.py
 
+import os
 import mlflow
 import mlflow.sklearn
 import yaml
@@ -20,7 +21,8 @@ def load_config():
     """
     Carga el archivo de configuración YAML.
     """
-    with open("src/config.yaml", "r") as file:
+    config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
+    with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
 
@@ -28,7 +30,15 @@ def load_config():
 def main():
     config = load_config()
 
-    mlflow.set_tracking_uri(config['paths']['mlflow_tracking_uri'])
+    # Configurar URI de tracking dinámicamente
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        # Ruta absoluta en entorno de GitHub Actions
+        mlflow.set_tracking_uri("file:///home/runner/work/ml_pipeline_project/ml_pipeline_project/mlruns")
+    else:
+        # Ruta local relativa segura
+        mlruns_path = os.path.abspath("mlruns")
+        mlflow.set_tracking_uri(f"file://{mlruns_path}")
+
     mlflow.set_experiment(config['paths']['experiment_name'])
 
     print("📊 Cargando y preprocesando datos...")
@@ -68,7 +78,7 @@ def main():
         mlflow.log_metric("r2", r2)
 
         signature = infer_signature(X_train, model.predict(X_train))
-        input_example = X_train[:5]
+        input_example = X_train[:5].tolist() if hasattr(X_train, "tolist") else X_train[:5]
 
         mlflow.sklearn.log_model(
             sk_model=model,
