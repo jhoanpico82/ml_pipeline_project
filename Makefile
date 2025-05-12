@@ -1,5 +1,3 @@
-# Makefile
-
 # Definir las rutas de los archivos
 VENV_DIR = .venv
 PYTHON = $(VENV_DIR)/bin/python
@@ -19,7 +17,7 @@ train:
 # Ejecutar pruebas básicas (por ahora, solo un placeholder)
 test:
 	@echo "🧪 Ejecutando pruebas..."
-	pytest tests/
+	$(PYTHON) -m pytest tests/
 
 # Limpiar (eliminar el entorno virtual)
 clean:
