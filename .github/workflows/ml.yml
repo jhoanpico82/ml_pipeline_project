@@ -1,0 +1,91 @@
+name: ML Training Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          pip install flake8
+
+      - name: Lint Python code
+        run: |
+          source .venv/bin/activate
+          flake8 src/
+
+  train:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies and train
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          python src/train.py  # Directamente ejecutar el script de entrenamiento
+
+      - name: Check if model is saved
+        run: |
+          if [ -f model.joblib ]; then
+            echo "Model found, proceeding to upload."
+          else
+            echo "Model not found. Aborting upload." && exit 1
+          fi
+
+      - name: Upload trained model as artifact
+        uses: actions/upload-artifact@v2  # Usamos la versión más estable
+        with:
+          name: trained-model
+          path: model.joblib  # Ajusta esta ruta si el modelo se guarda en otra ubicación
+
+
+
+
+
+      
