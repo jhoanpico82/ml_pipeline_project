@@ -39,9 +39,8 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Install dependencies
+      - name: Install dependencies and lint
         run: |
-          python -m venv .venv
           source .venv/bin/activate
           pip install -r requirements.txt
           pip install flake8
@@ -65,24 +64,24 @@ jobs:
 
       - name: Install dependencies and train
         run: |
-          python -m venv .venv
           source .venv/bin/activate
           pip install -r requirements.txt
-          python src/train.py  # Directamente ejecutar el script de entrenamiento
+          python src/train.py  # Ejecutar el script de entrenamiento
 
       - name: Check if model is saved
         run: |
-          if [ -f model.joblib ]; then
+          if [ -f model/model.pkl ]; then  # Ajusta según la ubicación del modelo guardado
             echo "Model found, proceeding to upload."
           else
             echo "Model not found. Aborting upload." && exit 1
           fi
 
       - name: Upload trained model as artifact
-        uses: actions/upload-artifact@v4  # Usamos la versión más estable
+        uses: actions/upload-artifact@v4
         with:
           name: trained-model
-          path: model.joblib  # Ajusta esta ruta si el modelo se guarda en otra ubicación
+          path: model/model.pkl  # Ajusta esta ruta según el modelo guardado por MLflow
+
 
 
 
