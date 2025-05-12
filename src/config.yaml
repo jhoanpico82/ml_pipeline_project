@@ -5,5 +5,5 @@ hyperparameters:
 
 paths:
   data_path: "data/vgsales.csv"
-  mlflow_tracking_uri: "http://localhost:8080"
+  mlflow_tracking_uri: "file:./mlruns"  # URI local para MLflow
   experiment_name: "video_game_sales_prediction"
