@@ -95,6 +95,14 @@ def main():
 if __name__ == "__main__":
     print("🚀 Ejecutando script de entrenamiento...")
     main()
+import os
+if not os.path.exists('model'):
+    os.makedirs('model')
 
+# Guardar el modelo entrenado
+joblib.dump(model, 'model/model.pkl')
+
+# Verificar que el archivo se guardó correctamente
+print("Modelo guardado como 'model/model.pkl'")
 
 
